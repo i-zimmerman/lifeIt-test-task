@@ -16,14 +16,12 @@ const register = (email, password) => {
   });
 };
 
-const getUsers = (page) => axios.get(`/users?/page=${page}`);
+const getUsers = (page) => axios.get(`/users?page=${page}`);
 
-const createUser = (name, job) => {
+const createUser = (data) =>
   axios.post("/users", {
-    name,
-    job,
+    ...data,
   });
-};
 
 const deleteUser = (userId) => axios.delete(`users/${userId}`);
 

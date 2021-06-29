@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import API from "../api";
+import API from "../../api";
 
 const initialState = {
   data: [],
   isLoading: false,
   error: null,
+  total: 0,
 };
 
 const usersSlice = createSlice({
@@ -16,6 +17,12 @@ const usersSlice = createSlice({
       state.error = null;
     },
     usersSuccess(state, action) {
+      state.data = [...state.data, ...action.payload.data];
+      state.isLoading = false;
+      state.error = null;
+      state.total = action.payload.total_pages;
+    },
+    userSuccess(state, action) {
       state.data = [...state.data, ...action.payload];
       state.isLoading = false;
       state.error = null;
@@ -50,6 +57,7 @@ const usersSlice = createSlice({
 
 export const {
   usersRequest,
+  userSuccess,
   usersSuccess,
   usersFailure,
   userDelete,
@@ -60,9 +68,9 @@ export const getUsers = (page) => async (dispatch) => {
   try {
     dispatch(usersRequest());
     const usersResponse = await API.getUsers(page);
-    dispatch(usersSuccess(usersResponse.data.data));
+    dispatch(usersSuccess(usersResponse.data));
   } catch (error) {
-    dispatch(usersFailure(error.response.data.error));
+    dispatch(usersFailure(error.message));
   }
 };
 
@@ -90,6 +98,20 @@ export const updateUser = (userId, userData) => async (dispatch) => {
     updatedUser.id = userId;
 
     dispatch(userUpdate(updatedUser));
+  } catch (error) {
+    dispatch(usersFailure(error.message));
+  }
+};
+
+export const createUser = (userData) => async (dispatch) => {
+  try {
+    dispatch(usersRequest());
+    const usersResponse = await API.createUser(userData);
+
+    const newUser = usersResponse.data;
+    newUser.first_name = newUser.name;
+
+    dispatch(userSuccess([newUser]));
   } catch (error) {
     dispatch(usersFailure(error.message));
   }

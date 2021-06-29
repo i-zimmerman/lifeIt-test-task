@@ -1,18 +1,23 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router";
-import { getUsers, deleteUser, updateUser } from "../app/services/usersSlice";
+import {
+  getUsers,
+  deleteUser,
+  updateUser,
+  createUser,
+} from "../store/slices/usersSlice";
 
 import styled from "styled-components";
-import { Spinner, Alert, Button } from "react-bootstrap";
+import { Spinner, Alert } from "react-bootstrap";
 
 import PageContainer from "../containers/PageContainer";
 import UsersTable from "../components/UsersTable";
-import UserEditModal from "../components/UserEditModal";
-
-// сreate, delete, update users
+import UserRow from "../components/UsersTable/components/UserRow";
+import UserCreateUpdateModal from "../components/UserCreateUpdateModal";
 
 const ScSpinnerContainer = styled.div`
+  position: sticky !important;
   display: flex;
   justify-content: center;
   width: 200px;
@@ -26,46 +31,60 @@ const ScSpinnerContainer = styled.div`
   top: 50%;
 `;
 
-const ScButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-
-  .user-button {
-    width: 100px;
-  }
-
-  .user-button:not(:last-of-type) {
-    margin-bottom: 20px;
-  }
-`;
-
 const MainPage = ({ authorized }) => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users);
-  const [page, setPage] = useState(0);
-  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [showUserModal, setShowUserModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+
+  const observer = useRef();
+  const lastUserRowRef = useCallback(
+    (node) => {
+      if (users.isLoading) return;
+
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (
+          entries[0].isIntersecting &&
+          page < users.total &&
+          users.total !== 0
+        ) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [users.isLoading, page, users.total]
+  );
 
   useEffect(() => {
     dispatch(getUsers(page));
   }, [dispatch, page]);
 
-  const handleSubmitEditUser = (data) => {
-    console.log(data, currentUserId);
-    dispatch(updateUser(currentUserId, data));
+  const handleSubmitUserModal = (data) => {
+    if (currentUserId) {
+      dispatch(updateUser(currentUserId, data));
+    } else {
+      dispatch(createUser(data));
+    }
 
-    handleCloseEditUserModal();
+    handleCloseUserModal();
   };
 
-  const handleCloseEditUserModal = () => {
-    setShowEditUserModal(false);
+  const handleCloseUserModal = () => {
+    setShowUserModal(false);
     setCurrentUserId(null);
   };
 
-  const handleEditUser = (userId) => {
-    setShowEditUserModal(true);
+  const handleEditUser = (userId = null) => {
+    setShowUserModal(true);
     setCurrentUserId(userId);
   };
 
@@ -87,52 +106,38 @@ const MainPage = ({ authorized }) => {
         </ScSpinnerContainer>
       )}
 
-      <UsersTable>
-        {users.data.map((user) => {
-          return (
-            <tr key={user.id}>
-              <th>{user.id}</th>
-              <th>{user.email}</th>
-              <th>{user.first_name}</th>
-              <th>{user.last_name}</th>
-              <th>{user.job || "no job"}</th>
-              <th>
-                <img
-                  src={user.avatar}
-                  alt={`${user.first_name} ${user.last_name} avatar`}
-                  height="50px"
-                  width="50px"
-                />
-              </th>
-              <th>
-                <ScButtonContainer>
-                  <Button
-                    onClick={() => handleEditUser(user.id)}
-                    className="user-button"
-                    variant="primary"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteUser(user.id)}
-                    className="user-button"
-                    variant="danger"
-                  >
-                    Delete
-                  </Button>
-                </ScButtonContainer>
-              </th>
-            </tr>
-          );
+      <UsersTable onCreateUser={handleEditUser}>
+        {users.data.map((user, idx, users) => {
+          if (idx + 1 === users.length) {
+            return (
+              <UserRow
+                ref={lastUserRowRef}
+                key={user.id}
+                user={user}
+                onUserDelete={handleDeleteUser}
+                onUserEdit={handleEditUser}
+              />
+            );
+          } else {
+            return (
+              <UserRow
+                key={user.id}
+                user={user}
+                onUserDelete={handleDeleteUser}
+                onUserEdit={handleEditUser}
+              />
+            );
+          }
         })}
       </UsersTable>
 
-      {showEditUserModal && (
-        <UserEditModal
-          show={showEditUserModal}
-          onClose={handleCloseEditUserModal}
-          onSubmit={handleSubmitEditUser}
-          userData={users.data.find((user) => user.id === currentUserId)}
+      {showUserModal && (
+        <UserCreateUpdateModal
+          show={showUserModal}
+          onClose={handleCloseUserModal}
+          onSubmit={handleSubmitUserModal}
+          userData={users.data.find((user) => user.id === currentUserId) || {}}
+          userId={currentUserId}
         />
       )}
 

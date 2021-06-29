@@ -4,13 +4,16 @@ import { Modal, Button, InputGroup, FormControl } from "react-bootstrap";
 // fix for header closeButton prop styles bug
 import "./style.css";
 
-const UserEditModal = ({ show, onClose, onSubmit, userData }) => {
+const UserEditModal = ({ show, onClose, onSubmit, userData, userId }) => {
   const [name, setName] = useState(userData.first_name || "");
   const [job, setJob] = useState(userData.job || "");
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const validationErrors = {};
+    if (!name) {
+      validationErrors.name = "Name is required";
+    }
     if (name.length > 10) {
       validationErrors.name = "Name can't be longer than 10 chars";
     }
@@ -30,12 +33,12 @@ const UserEditModal = ({ show, onClose, onSubmit, userData }) => {
     <>
       <Modal show={show} onHide={onClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit user data</Modal.Title>
+          <Modal.Title>{userId ? "Edit user" : "Add new user"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <InputGroup className="mb-3">
             <InputGroup.Text id="inputGroup-sizing-default">
-              New name
+              {userId ? "Edit user" : "Add new user"}
             </InputGroup.Text>
             <FormControl
               onChange={(e) => setName(e.target.value)}
