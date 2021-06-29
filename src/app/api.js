@@ -27,12 +27,10 @@ const createUser = (name, job) => {
 
 const deleteUser = (userId) => axios.delete(`users/${userId}`);
 
-const updateUser = (userId, name, job) => {
+const updateUser = (userId, data) =>
   axios.put(`users/${userId}`, {
-    name,
-    job,
+    ...data,
   });
-};
 
 const API = {
   login,

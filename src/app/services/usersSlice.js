@@ -29,11 +29,32 @@ const usersSlice = createSlice({
       state.error = null;
       state.data = state.data.filter((user) => user.id !== action.payload);
     },
+    userUpdate(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const newState = [...state.data];
+      const currentUserIdx = newState.findIndex(
+        (user) => user.id === action.payload.id
+      );
+      const currentUser = newState[currentUserIdx];
+
+      newState[currentUserIdx] = {
+        ...currentUser,
+        ...action.payload,
+      };
+
+      state.data = newState;
+    },
   },
 });
 
-export const { usersRequest, usersSuccess, usersFailure, userDelete } =
-  usersSlice.actions;
+export const {
+  usersRequest,
+  usersSuccess,
+  usersFailure,
+  userDelete,
+  userUpdate,
+} = usersSlice.actions;
 
 export const getUsers = (page) => async (dispatch) => {
   try {
@@ -54,6 +75,21 @@ export const deleteUser = (userId) => async (dispatch) => {
     } else {
       throw new Error("There was an error deleting user");
     }
+  } catch (error) {
+    dispatch(usersFailure(error.message));
+  }
+};
+
+export const updateUser = (userId, userData) => async (dispatch) => {
+  try {
+    dispatch(usersRequest());
+    const usersResponse = await API.updateUser(userId, userData);
+
+    const updatedUser = usersResponse.data;
+    updatedUser.first_name = updatedUser.name;
+    updatedUser.id = userId;
+
+    dispatch(userUpdate(updatedUser));
   } catch (error) {
     dispatch(usersFailure(error.message));
   }
