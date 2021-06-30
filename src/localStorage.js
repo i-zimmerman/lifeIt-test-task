@@ -29,13 +29,3 @@ export const removeLocalUserData = () => {
 export const isUserStoredLocally = () => {
   return Boolean(window.localStorage.getItem("reqresToken"));
 };
-
-// on app start check local
-// if has all the data
-// log in
-
-// otherwise
-
-// log in
-// success
-// store data in local storage

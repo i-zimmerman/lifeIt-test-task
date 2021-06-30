@@ -27,6 +27,10 @@ const MainPage = ({ authorized }) => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
 
+  useEffect(() => {
+    dispatch(getUsers(page));
+  }, [dispatch, page]);
+
   const observer = useRef();
   const lastUserRowRef = useCallback(
     (node) => {
@@ -52,10 +56,6 @@ const MainPage = ({ authorized }) => {
     },
     [users.isLoading, page, users.total]
   );
-
-  useEffect(() => {
-    dispatch(getUsers(page));
-  }, [dispatch, page]);
 
   const handleSubmitUserModal = (data) => {
     if (currentUserId) {

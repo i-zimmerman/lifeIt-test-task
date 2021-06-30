@@ -49,7 +49,6 @@ export const { loginRequest, loginSuccess, loginFailure, logoutRequest } =
 export const login = (email, password, storeLocally) => async (dispatch) => {
   try {
     dispatch(loginRequest());
-    console.log("login");
     const response = await API.login(email, password);
 
     const user = { ...response.data };
@@ -57,7 +56,6 @@ export const login = (email, password, storeLocally) => async (dispatch) => {
     user.password = password;
 
     if (storeLocally) {
-      console.log("storing locally");
       storeUserLocally(user.email, user.password, user.token);
     }
 
