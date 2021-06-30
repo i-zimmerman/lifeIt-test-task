@@ -1,37 +1,26 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router";
+import { useHistory } from "react-router-dom";
 import {
   getUsers,
   deleteUser,
   updateUser,
   createUser,
+  usersClearOnUnmount,
 } from "../store/slices/usersSlice";
+import { logout } from "../store/slices/loginSlice";
 
-import styled from "styled-components";
-import { Spinner, Alert } from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 
 import PageContainer from "../containers/PageContainer";
 import UsersTable from "../components/UsersTable";
 import UserRow from "../components/UsersTable/components/UserRow";
 import UserCreateUpdateModal from "../components/UserCreateUpdateModal";
-
-const ScSpinnerContainer = styled.div`
-  position: sticky !important;
-  display: flex;
-  justify-content: center;
-  width: 200px;
-  position: absolute;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 100;
-  top: 50%;
-`;
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const MainPage = ({ authorized }) => {
+  const history = useHistory();
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users);
   const [page, setPage] = useState(1);
@@ -92,19 +81,29 @@ const MainPage = ({ authorized }) => {
     dispatch(deleteUser(userId));
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(usersClearOnUnmount());
+    history.push("/login");
+  };
+
   if (!authorized) {
     return <Redirect to="/login" />;
   }
 
   return (
     <PageContainer fluid>
-      {users.isLoading && (
-        <ScSpinnerContainer>
-          <Spinner animation="grow" />
-          <Spinner animation="grow" />
-          <Spinner animation="grow" />
-        </ScSpinnerContainer>
-      )}
+      {users.isLoading && <LoadingSpinner />}
+
+      <div
+        style={{
+          display: "flex",
+          marginBottom: "20px",
+          justifyContent: "flex-end",
+        }}
+      >
+        <Button onClick={handleLogout}>Logout</Button>
+      </div>
 
       <UsersTable onCreateUser={handleEditUser}>
         {users.data.map((user, idx, users) => {
