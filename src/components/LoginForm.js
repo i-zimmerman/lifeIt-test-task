@@ -1,12 +1,37 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import styled from "styled-components";
 
-const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const ScFormContolsContainer = styled.div`
+  display: flex;
+  justify-content: left;
+  align-items: center;
+
+  > div {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 150px;
+  }
+
+  #rememberMeCheckbox {
+    width: 20px;
+  }
+`;
+
+const LoginForm = ({ onSubmit, registeredData }) => {
+  const [email, setEmail] = useState(registeredData.email || "");
+  const [password, setPassword] = useState(registeredData.password || "");
+  const [rememberLogin, setRememberLogin] = useState(false);
+
+  const handleSubmitLogin = (e) => {
+    e.preventDefault();
+
+    onSubmit(email, password, rememberLogin);
+  };
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmitLogin}>
       <Form.Group
         onChange={(e) => {
           setEmail(e.target.value);
@@ -15,7 +40,11 @@ const LoginForm = () => {
         controlId="formBasicEmail"
       >
         <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
+        <Form.Control
+          defaultValue={email}
+          type="email"
+          placeholder="Enter email"
+        />
       </Form.Group>
 
       <Form.Group
@@ -26,16 +55,30 @@ const LoginForm = () => {
         controlId="formBasicPassword"
       >
         <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
+        <Form.Control
+          defaultValue={password}
+          type="password"
+          placeholder="Password"
+        />
       </Form.Group>
 
-      <Button variant="primary" type="submit" style={{ marginRight: "30px" }}>
-        "Login"
-      </Button>
-
-      <a className="btn btn-secondary" href="/register" role="button">
-        Register
-      </a>
+      <ScFormContolsContainer>
+        <Button variant="primary" type="submit" style={{ marginRight: "30px" }}>
+          Login
+        </Button>
+        <div>
+          <label htmlFor="rememberMeCheckbox">Remember me</label>
+          <input
+            onChange={(e) => setRememberLogin(e.target.value)}
+            value={rememberLogin}
+            id="rememberMeCheckbox"
+            type="checkbox"
+          ></input>
+        </div>
+        <Button variant="link" href="/register" role="button">
+          Register
+        </Button>
+      </ScFormContolsContainer>
     </Form>
   );
 };

@@ -14,22 +14,17 @@ const UsersTable = ({ children, onCreateUser, ...props }) => {
           <th className="th">Last Name</th>
           <th className="th">Job</th>
           <th className="th">Avatar</th>
-          <th
-            className="th"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {" "}
-            <Button
-              onClick={() => onCreateUser()}
-              className="user-button"
-              variant="primary"
-            >
-              Create user
-            </Button>
+          <th className="th">
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                style={{ textAlign: "center" }}
+                onClick={() => onCreateUser()}
+                className="user-button"
+                variant="primary"
+              >
+                Create user
+              </Button>
+            </div>
           </th>
         </tr>
       </thead>

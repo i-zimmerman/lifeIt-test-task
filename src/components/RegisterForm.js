@@ -1,12 +1,26 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { validateLogin } from "../utils";
 
-const RegisterForm = () => {
+const RegisterForm = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const vErrors = validateLogin(email, password);
+
+    if (Object.keys(vErrors).length) {
+      setErrors(vErrors);
+      return;
+    }
+
+    onSubmit(email, password);
+  };
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <Form.Group
         onChange={(e) => {
           setEmail(e.target.value);
@@ -15,7 +29,15 @@ const RegisterForm = () => {
         controlId="formBasicEmail"
       >
         <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
+        <Form.Control
+          name="email"
+          type="email"
+          placeholder="Enter email"
+          isInvalid={!!errors.email}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.email}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group
@@ -26,16 +48,24 @@ const RegisterForm = () => {
         controlId="formBasicPassword"
       >
         <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
+        <Form.Control
+          isInvalid={!!errors.password}
+          name="password"
+          type="password"
+          placeholder="Password"
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.password}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Button variant="primary" type="submit" style={{ marginRight: "30px" }}>
         Register
       </Button>
 
-      <a className="btn btn-secondary" href="/login" role="button">
+      <Button variant="link" href="/login" role="button">
         Go back to login page
-      </a>
+      </Button>
     </Form>
   );
 };
