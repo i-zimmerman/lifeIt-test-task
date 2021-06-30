@@ -3,7 +3,7 @@ export const storeUserLocally = (email, password, token) => {
 
   storage.setItem("email", email);
   storage.setItem("password", password);
-  storage.setItem("token", token);
+  storage.setItem("reqresToken", token);
 };
 
 export const getLocalUserData = () => {
@@ -12,7 +12,7 @@ export const getLocalUserData = () => {
   const user = {
     email: storage.getItem("email"),
     password: storage.getItem("password"),
-    token: storage.getItem("token"),
+    token: storage.getItem("reqresToken"),
   };
 
   return user;
@@ -22,12 +22,12 @@ export const removeLocalUserData = () => {
   const storage = window.localStorage;
 
   storage.removeItem("email");
-  storage.removeItem("token");
+  storage.removeItem("reqresToken");
   storage.removeItem("password");
 };
 
 export const isUserStoredLocally = () => {
-  return Boolean(window.localStorage.getItem("email"));
+  return Boolean(window.localStorage.getItem("reqresToken"));
 };
 
 // on app start check local

@@ -2,19 +2,17 @@ import axios from "axios";
 
 axios.defaults.baseURL = "https://reqres.in/api/";
 
-const login = (email, password) => {
+const login = (email, password) =>
   axios.post("/login", {
     email,
     password,
   });
-};
 
-const register = (email, password) => {
+const register = (email, password) =>
   axios.post("/register", {
     email,
     password,
   });
-};
 
 const getUsers = (page) => axios.get(`/users?page=${page}`);
 

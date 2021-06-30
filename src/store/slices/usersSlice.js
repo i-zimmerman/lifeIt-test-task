@@ -52,6 +52,12 @@ const usersSlice = createSlice({
 
       state.data = newState;
     },
+    usersClearOnUnmount(state) {
+      state.data = [];
+      state.isLoading = false;
+      state.error = null;
+      state.total = 0;
+    },
   },
 });
 
@@ -62,6 +68,7 @@ export const {
   usersFailure,
   userDelete,
   userUpdate,
+  usersClearOnUnmount,
 } = usersSlice.actions;
 
 export const getUsers = (page) => async (dispatch) => {
@@ -115,6 +122,10 @@ export const createUser = (userData) => async (dispatch) => {
   } catch (error) {
     dispatch(usersFailure(error.message));
   }
+};
+
+export const clearUsers = () => async (dispatch) => {
+  dispatch(usersClearOnUnmount());
 };
 
 export default usersSlice.reducer;
