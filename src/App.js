@@ -12,7 +12,7 @@ function App() {
   const isStoredLocally = isUserStoredLocally();
 
   return (
-    <Router>
+    <Router basename="/index.html">
       <Switch>
         <Route exact path="/">
           <MainPage authorized={isAuthorized || isStoredLocally} />
