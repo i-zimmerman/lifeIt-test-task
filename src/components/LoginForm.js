@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
 import styled from "styled-components";
 
@@ -75,9 +76,11 @@ const LoginForm = ({ onSubmit, registeredData }) => {
             type="checkbox"
           ></input>
         </div>
-        <Button variant="link" href="/register" role="button">
-          Register
-        </Button>
+        <Link to="/register">
+          <Button variant="link" role="button">
+            Register
+          </Button>
+        </Link>
       </ScFormContolsContainer>
     </Form>
   );

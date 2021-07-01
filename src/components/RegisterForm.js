@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
 import { validateLogin } from "../utils";
 
@@ -63,9 +64,11 @@ const RegisterForm = ({ onSubmit }) => {
         Register
       </Button>
 
-      <Button variant="link" href="/login" role="button">
-        Go back to login page
-      </Button>
+      <Link to="/login">
+        <Button variant="link" role="button">
+          Go back to login page
+        </Button>
+      </Link>
     </Form>
   );
 };
